@@ -1,8 +1,24 @@
 package com.example.ahmed.zgo;
 
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+
 /**
  * Created by ahmed on 1/15/2017.
  */
+public class Background extends Service {
 
-public class Background {
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // do your jobs here
+        return super.onStartCommand(intent, flags, startId);
+    }
 }

@@ -23,7 +23,6 @@ public class Login extends AppCompatActivity {
 
     private Button signup, signin;
     private EditText name, pass;
-    private CheckBox remember;
     private Database myDB;
     private ImageView image;
 
@@ -38,7 +37,6 @@ public class Login extends AppCompatActivity {
         signin = (Button) findViewById(R.id.login_signin);
         name = (EditText) findViewById(R.id.login_username);
         pass = (EditText) findViewById(R.id.login_password);
-        remember = (CheckBox) findViewById(R.id.login_remember);
         image = (ImageView) findViewById(R.id.login_image);
 
         enter();
