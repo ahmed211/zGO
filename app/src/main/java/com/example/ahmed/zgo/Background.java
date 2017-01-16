@@ -18,7 +18,6 @@ public class Background extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // do your jobs here
         return super.onStartCommand(intent, flags, startId);
     }
 }

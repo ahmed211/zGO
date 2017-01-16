@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -64,6 +65,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Map extends AppCompatActivity
@@ -82,6 +84,11 @@ public class Map extends AppCompatActivity
     GoogleApiClient client;
     GoogleMap map;
 
+    Bitmap mbitmap, dataimage;
+    Database myDB;
+    byte[] byteImage;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +106,8 @@ public class Map extends AppCompatActivity
 
 
         startService(new Intent(this, Background.class));
+
+        myDB=new Database(this);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -144,7 +153,10 @@ public class Map extends AppCompatActivity
 
         geoLocate();
 
+
+
     }
+
 
     public boolean googleServices() {
         GoogleApiAvailability ga = GoogleApiAvailability.getInstance();
@@ -167,6 +179,7 @@ public class Map extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             Intent intent = new Intent(Map.this, History.class);
+            intent.putExtra("username", name.getText());
             startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -225,6 +238,8 @@ public class Map extends AppCompatActivity
                     setMarker(localityto, latt, lngt);
 
 
+                    screenShot(findViewById(R.id.map_fragment));
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -232,6 +247,52 @@ public class Map extends AppCompatActivity
             }
         });
     }
+
+
+
+    public static byte[] getBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        return stream.toByteArray();
+    }
+
+
+
+    public void screenShot(View view) {
+        mbitmap = getBitmapOFRootView(find);
+        createImage(mbitmap);
+        byteImage=getBytes(mbitmap);
+
+
+
+        myDB.imageInsertData(name.getText().toString(), byteImage);
+
+    }
+
+    public Bitmap getBitmapOFRootView(View v) {
+        View rootview = v.getRootView();
+        rootview.setDrawingCacheEnabled(true);
+        Bitmap bitmap1 = rootview.getDrawingCache();
+        return bitmap1;
+    }
+
+    public void createImage(Bitmap bmp) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+        File file = new File(Environment.getExternalStorageDirectory() + "/capturedscreenandroid.jpg");
+        try {
+            file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            outputStream.write(bytes.toByteArray());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
 
     Marker marker1, marker2;
@@ -272,7 +333,6 @@ public class Map extends AppCompatActivity
         line = map.addPolyline(options);
         int distance = (int) SphericalUtil.computeDistanceBetween(marker1.getPosition(), marker2.getPosition());
         dist.setText( "Distance : "+ distance/1000 +"  Kilometers");
-        //Toast.makeText(this, "Distance : "+ distance/1000 +"  Kilometers", Toast.LENGTH_LONG).show();
     }
 
     private void removeEverything() {
@@ -280,6 +340,8 @@ public class Map extends AppCompatActivity
         marker1=null;
         marker2.remove();
         marker2=null;
+        line.remove();;
+        line=null;
     }
 
 
